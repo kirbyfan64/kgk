@@ -1,0 +1,5 @@
+git+https://github.com/kirbyfan64/zdiscord.git
+requests
+redis
+beautifulsoup4
+lxml
