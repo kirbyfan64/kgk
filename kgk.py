@@ -5,12 +5,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
-import discord, hashlib, json, lxml, random, re, redis, requests
+import asyncio, discord, hashlib, json, lxml, os, random, re, redis, requests, sys
 from contextlib import contextmanager
 from bs4 import BeautifulSoup
 import zdiscord
-
-import asyncio, sys
 
 
 class Config(zdiscord.Config):
@@ -25,10 +23,15 @@ class KGKCommands:
     def __init__(self, bot):
         self.bot = bot
         self.logger = self.bot.logger
-        self.r = redis.StrictRedis(host=self.bot.config.redis['host'],
-                                   port=int(self.bot.config.redis['port']),
-                                   password=self.bot.config.redis.get('password'),
-                                   db=0)
+
+        if 'env_url' in self.bot.config.redis:
+            self.r = redis.StrictRedis.from_url(
+                        os.environ[self.bot.config.redis['env_url']])
+        else:
+            self.r = redis.StrictRedis(host=self.bot.config.redis['host'],
+                                       port=int(self.bot.config.redis['port']),
+                                       password=self.bot.config.redis.get('password'),
+                                       db=0)
 
 
     async def get_pinterest_image(self, url):
@@ -39,8 +42,10 @@ class KGKCommands:
         current_url = None
         for script in html.find_all('script', type='application/json'):
             tree = json.loads(script.string)
-            meta = tree['initialPageInfo']['meta']
-            return meta['twitter:image:src']
+            if 'initialPageInfo' not in tree:
+                continue
+
+            return tree['initialPageInfo']['meta']['twitter:image:src']
 
         await self.bot.say(
             "I couldn't find any pictures at that Pinterest URL... :thinking:")
@@ -100,9 +105,10 @@ class KGKCommands:
             p.sadd('images', hashed)
             p.hset('images:byhash', hashed, url)
 
-            p.sadd(f'tags:{hashed}', *tags)
-            for tag in tags:
-                p.sadd(f'tag:{tag}', hashed)
+            if tags:
+                p.sadd(f'tags:{hashed}', *tags)
+                for tag in tags:
+                    p.sadd(f'tag:{tag}', hashed)
 
             p.execute()
 

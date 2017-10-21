@@ -1,0 +1,11 @@
+version: '3'
+services:
+  bot:
+    build: .
+    command: 'python3 /kgk/kgk.py /kgk/kgk.yml'
+  redis:
+    image: 'bitnami/redis:latest'
+    expose:
+      - '6379'
+    env_file:
+      - redis.env

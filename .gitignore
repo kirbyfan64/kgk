@@ -1,4 +1,4 @@
 redis/database.rdb
-redis/redis.log
-*.log*
+redis.env
 local.yml
+*.log*
