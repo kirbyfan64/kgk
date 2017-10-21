@@ -25,7 +25,9 @@ class KGKCommands:
     def __init__(self, bot):
         self.bot = bot
         self.logger = self.bot.logger
-        self.r = redis.StrictRedis(host='localhost', port=6379, db=0)
+        self.r = redis.StrictRedis(host=self.bot.config.redis['host'],
+                                   port=int(self.bot.config.redis['port']),
+                                   db=0)
 
 
     async def get_pinterest_image(self, url):
@@ -55,12 +57,24 @@ class KGKCommands:
 
         return url, hashlib.blake2s(url.encode('utf-8')).hexdigest()
 
+
     async def get_image(self, url):
         bhashed = self.r.hget('images:byurl', url)
         if bhashed is None:
             await self.bot.say("I don't have this image saved!!")
             return
         return bhashed.decode('utf-8')
+
+
+    async def check_user(self, ctx):
+        required_roles = set(role.lower() for role in self.bot.config.roles)
+        used_roles =  set(role.name.lower() for role in ctx.message.author.roles)
+
+        if required_roles & used_roles:
+            return True
+        else:
+            await self.bot.say("Sorry, you don't have permission to do that. :shrug:")
+            return False
 
 
     async def verify_tags(self, tags):
@@ -73,7 +87,7 @@ class KGKCommands:
 
 
     @zdiscord.safe_command
-    async def add(self, url, *tags):
+    async def add(self, ctx, url, *tags):
         '''
         Adds an image.
 
@@ -83,7 +97,7 @@ class KGKCommands:
 
         self.logger.info(f'addimage {url} {tags}')
 
-        if not await self.verify_tags(tags):
+        if not await self.check_user(ctx) or not await self.verify_tags(tags):
             return
 
         url, hashed = await self.get_url(url)
@@ -105,7 +119,7 @@ class KGKCommands:
 
 
     @zdiscord.safe_command
-    async def remove(self, url):
+    async def remove(self, ctx, url):
         '''
         Removes an image.
 
@@ -114,6 +128,9 @@ class KGKCommands:
         '''
 
         self.logger.info(f'remove {url}')
+
+        if not await self.check_user(ctx):
+            return
 
         hashed = await self.get_image(url)
         if hashed is None:
@@ -145,7 +162,7 @@ class KGKCommands:
 
 
     @zdiscord.safe_command
-    async def image(self, tag=None):
+    async def image(self, ctx, tag=None):
         '''
         Displays a random image. If a tag is given, then display an image with the given
         tag.
@@ -156,6 +173,9 @@ class KGKCommands:
         '''
 
         self.logger.info(f'image {tag!r}')
+
+        if not await self.check_user() or not self.verify_tags([tag]):
+            return
 
         hashed = self.r.srandmember('images' if tag is None else f'tag:{tag}')
         url = self.r.hget('images:byhash', hashed)
@@ -195,7 +215,7 @@ class KGKCommands:
 
 
     @zdiscord.safe_command
-    async def tag(self, url, *tags):
+    async def tag(self, ctx, url, *tags):
         '''
         Add tags to an image.
 
@@ -205,7 +225,7 @@ class KGKCommands:
 
         self.logger.info(f'tag {url} {tags}')
 
-        if not await self.verify_tags(tags):
+        if not await self.check_user(ctx) or not await self.verify_tags(tags):
             return
 
         hashed = await self.get_image(url)
@@ -222,7 +242,7 @@ class KGKCommands:
         await self.bot.say('Done!')
 
     @zdiscord.safe_command
-    async def untag(self, url, *tags):
+    async def untag(self, ctx, url, *tags):
         '''
         Remove the given tags from an image.
 
@@ -232,7 +252,7 @@ class KGKCommands:
 
         self.logger.info(f'untag {url} {tags}')
 
-        if not await self.verify_tags(tags):
+        if not await self.check_user(ctx) or not await self.verify_tags(tags):
             return
 
         hashed = await self.get_image(url)
