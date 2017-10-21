@@ -27,7 +27,7 @@ class KGKCommands:
         self.logger = self.bot.logger
         self.r = redis.StrictRedis(host=self.bot.config.redis['host'],
                                    port=int(self.bot.config.redis['port']),
-                                   password=self.bot.config.redis.get('password')),
+                                   password=self.bot.config.redis.get('password'),
                                    db=0)
 
 
@@ -175,7 +175,7 @@ class KGKCommands:
 
         self.logger.info(f'image {tag!r}')
 
-        if not await self.check_user() or not self.verify_tags([tag]):
+        if not await self.verify_tags([tag]):
             return
 
         hashed = self.r.srandmember('images' if tag is None else f'tag:{tag}')
