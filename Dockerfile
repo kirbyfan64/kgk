@@ -1,3 +1,4 @@
+LABEL name="kgk"
 FROM alpine:edge
 
 COPY local.yml /kgk/kgk.yml
