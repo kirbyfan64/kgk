@@ -34,7 +34,6 @@ class KGKCommands:
     async def get_pinterest_image(self, url):
         resp = requests.get(url)
         html = BeautifulSoup(resp.content, 'lxml')
-        self.logger.info(resp.content)
 
         current_size = 0
         current_url = None
@@ -57,14 +56,6 @@ class KGKCommands:
             return None, None
 
         return url, hashlib.blake2s(url.encode('utf-8')).hexdigest()
-
-
-    async def get_image(self, url):
-        bhashed = self.r.hget('images:byurl', url)
-        if bhashed is None:
-            await self.bot.say("I don't have this image saved!!")
-            return
-        return bhashed.decode('utf-8')
 
 
     async def check_user(self, ctx):
@@ -107,7 +98,6 @@ class KGKCommands:
 
         with self.r.pipeline() as p:
             p.sadd('images', hashed)
-            p.hset('images:byurl', url, hashed)
             p.hset('images:byhash', hashed, url)
 
             p.sadd(f'tags:{hashed}', *tags)
@@ -133,7 +123,7 @@ class KGKCommands:
         if not await self.check_user(ctx):
             return
 
-        hashed = await self.get_image(url)
+        _, hashed = await self.get_url(url)
         if hashed is None:
             return
 
@@ -145,7 +135,6 @@ class KGKCommands:
                     p.multi()
 
                     p.srem('images', hashed)
-                    p.hdel('images:byurl', url)
                     p.hdel('images:byhash', hashed)
 
                     p.delete(f'tags:{hashed}')
@@ -198,7 +187,7 @@ class KGKCommands:
         if url is None:
             tags = [tag.replace(b'tag:', b'') for tag in self.r.keys('tag:*')]
         else:
-            hashed = await self.get_image(url)
+            _, hashed = await self.get_url(url)
             if hashed is None:
                 return
 
@@ -229,7 +218,7 @@ class KGKCommands:
         if not await self.check_user(ctx) or not await self.verify_tags(tags):
             return
 
-        hashed = await self.get_image(url)
+        _, hashed = await self.get_url(url)
         if hashed is None:
             return
 
@@ -256,7 +245,7 @@ class KGKCommands:
         if not await self.check_user(ctx) or not await self.verify_tags(tags):
             return
 
-        hashed = await self.get_image(url)
+        _, hashed = await self.get_url(url)
         if hashed is None:
             return
 
