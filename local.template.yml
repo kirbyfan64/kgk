@@ -1,6 +1,8 @@
 token: YOUR_DISCORD_TOKEN_HERE
 roles: [LIST, OF, ADMINISTRATIVE, ROLES, HERE]
 redis:
+  # For Heroku:
+  # env_url: REDIS_URL
   host: REDIS_HOST_HERE
   port: REDIS_PORT_HERE
   password: REDIS_PASSWORD_HERE
