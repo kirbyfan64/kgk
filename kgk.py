@@ -27,6 +27,7 @@ class KGKCommands:
         self.logger = self.bot.logger
         self.r = redis.StrictRedis(host=self.bot.config.redis['host'],
                                    port=int(self.bot.config.redis['port']),
+                                   password=self.bot.config.redis.get('password')),
                                    db=0)
 
 
