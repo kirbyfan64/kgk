@@ -1,0 +1,4 @@
+redis/database.rdb
+redis/redis.log
+*.log*
+local.yml

@@ -1,4 +1,4 @@
-git+https://github.com/kirbyfan64/zdiscord.git
+https://github.com/kirbyfan64/zdiscord/archive/master.zip
 requests
 redis
 beautifulsoup4

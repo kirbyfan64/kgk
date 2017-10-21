@@ -175,7 +175,7 @@ class KGKCommands:
 
         self.logger.info(f'image {tag!r}')
 
-        if not await self.verify_tags([tag]):
+        if tag is not None and not await self.verify_tags([tag]):
             return
 
         hashed = self.r.srandmember('images' if tag is None else f'tag:{tag}')
@@ -277,7 +277,7 @@ class KGK(zdiscord.Bot):
 
 def main():
     asyncio.set_event_loop(asyncio.new_event_loop())
-    zdiscord.main(KGK, Config())
+    zdiscord.main(KGK, Config(sys.argv[1] if len(sys.argv) > 1 else None))
 
 
 if __name__ == '__main__':
