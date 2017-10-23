@@ -94,6 +94,7 @@ class KGKCommands:
 
         self.logger.info(f'addimage {url} {tags}')
 
+        tags = list(map(str.lower, tags))
         if not await self.check_user(ctx) or not await self.verify_tags(tags):
             return
 
@@ -170,6 +171,7 @@ class KGKCommands:
 
         self.logger.info(f'image {tag!r}')
 
+        tag = tag.lower()
         if tag is not None and not await self.verify_tags([tag]):
             return
 
@@ -221,6 +223,7 @@ class KGKCommands:
 
         self.logger.info(f'tag {url} {tags}')
 
+        tags = list(map(str.lower, tags))
         if not await self.check_user(ctx) or not await self.verify_tags(tags):
             return
 
@@ -248,6 +251,7 @@ class KGKCommands:
 
         self.logger.info(f'untag {url} {tags}')
 
+        tags = list(map(str.lower, tags))
         if not await self.check_user(ctx) or not await self.verify_tags(tags):
             return
 
