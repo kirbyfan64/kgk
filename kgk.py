@@ -171,9 +171,9 @@ class KGKCommands:
 
         self.logger.info(f'image {tag!r}')
 
-        tag = tag.lower()
         if tag is not None and not await self.verify_tags([tag]):
             return
+        tag = tag.lower()
 
         hashed = self.r.srandmember('images' if tag is None else f'tag:{tag}')
         url = self.r.hget('images:byhash', hashed)
