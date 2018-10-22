@@ -1,5 +1,0 @@
-https://github.com/kirbyfan64/zdiscord/archive/master.zip
-requests
-redis
-beautifulsoup4
-lxml

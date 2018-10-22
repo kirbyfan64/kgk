@@ -1,4 +1,9 @@
-redis/database.rdb
-redis.env
+.bluecap/
+.crystal/
+.shards/
+bin/
+lib/
+dump.rdb
 local.yml
-*.log*
+redis.env
+shard.lock

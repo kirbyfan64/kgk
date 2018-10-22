@@ -1,8 +1,9 @@
-token: YOUR_DISCORD_TOKEN_HERE
-roles: [LIST, OF, ADMINISTRATIVE, ROLES, HERE]
-redis:
-  # For Heroku:
-  # env_url: REDIS_URL
-  host: REDIS_HOST_HERE
-  port: REDIS_PORT_HERE
-  password: REDIS_PASSWORD_HERE
+discord:
+  client-id: DISCORD_CLIENT_ID_HERE
+  token: DISCORD_TOKEN_HERE
+# Enable debug logging?
+# debug: true
+redis: 'REDIS_URL_GOES_HERE'
+# redis: '$OR_ENVIRONMENT_VARIABLE'
+roles: [roles, that, can, add, images, go, here]
+digest: sha256

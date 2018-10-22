@@ -1,0 +1,15 @@
+name: kgk
+version: 0.1.0
+
+dependencies:
+  crystagiri:
+    github: madeindjs/crystagiri
+  discordcr:
+    github: meew0/discordcr
+    branch: master
+  redis:
+    github: stefanwille/crystal-redis
+
+targets:
+  kgk:
+    main: src/kgk.cr

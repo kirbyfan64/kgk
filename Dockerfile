@@ -1,10 +1,14 @@
-FROM alpine:edge
+FROM crystallang/crystal
 LABEL name="kgk"
 
-COPY local.yml /kgk/kgk.yml
-COPY kgk.py /kgk/kgk.py
-COPY requirements.txt /kgk/requirements.txt
-COPY docker.sh /kgk/docker.sh
+ADD shard.yml /app/
+ADD shard.lock /app/
+WORKDIR /app
+RUN shards install
 
-RUN ash /kgk/docker.sh
-CMD python3 /kgk/kgk.py /kgk/kgk.yml
+ADD src /app/src
+ADD local.yml /app/
+
+RUN shards build
+
+CMD /app/bin/kgk
